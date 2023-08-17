@@ -25,7 +25,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Add review checklist
-        uses: sloede/add-pr-review-checklist@main
+        uses: trixi-framework/add-pr-review-checklist@v1
         with:
           file: '.github/review-checklist.md'
           no-checklist-keyword: '[no checklist]'
