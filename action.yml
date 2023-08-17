@@ -25,7 +25,12 @@ runs:
             repo: context.repo.repo,
           });
           const description = result.data.body;
-          return description.includes('${{ inputs.no-checklist-keyword }}');
+          if (description.includes('${{ inputs.no-checklist-keyword }}')) {
+            console.log('Checklist creation disabled by keyword in PR description')
+            return false;
+          } else {
+            return true;
+          }
     - name: Read review checklist template from file
       if: steps.check-create-checklist.outputs.result == 'true'
       shell: bash
@@ -37,7 +42,7 @@ runs:
           echo 'REVIEW_CHECKLIST_EOF'
         } >> "$GITHUB_ENV"
     - name: Add review checklist as comment
-      if: steps.check.outputs.create-checklist == 'true'
+      if: steps.check-create-checklist.outputs.result == 'true'
       uses: actions/github-script@v6
       with:
         script: |
