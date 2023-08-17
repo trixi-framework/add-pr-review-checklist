@@ -17,6 +17,7 @@ runs:
           echo
           echo 'REVIEW_CHECKLIST_EOF'
         } >> "$GITHUB_ENV"
+      shell: bash
     - name: Add review checklist as comment
       uses: actions/github-script@v6
       with:
