@@ -15,6 +15,9 @@ on:
   pull_request_target:
     types: [opened]
 
+permissions:
+  pull-requests: write
+
 jobs:
   add-review-checklist:
     runs-on: ubuntu-latest
