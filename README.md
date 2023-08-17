@@ -27,8 +27,14 @@ jobs:
       - name: Add review checklist
         uses: sloede/add-pr-review-checklist@main
         with:
-          file: .github/review-checklist.md
+          file: '.github/review-checklist.md'
+          no-checklist-keyword: '[no checklist]'
 ```
+
+Modify the `file` input parameter to contain the path to your checklist file. If the string
+specified by the `no-checklist-keyword` parameter is found in the pull request description,
+no checklist is created. This can be useful for, e.g., trivial PRs that does not
+require a full review.
 
 ## Author
 This repository was initiated by [Michael Schlottke-Lakemper](https://lakemper.eu).
