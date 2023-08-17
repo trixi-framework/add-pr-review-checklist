@@ -26,31 +26,22 @@ runs:
           });
           const description = result.data.body;
           if (description.includes('${{ inputs.no-checklist-keyword }}')) {
-            console.log('Checklist creation disabled by keyword in PR description')
+            console.log('Checklist creation disabled by keyword "${{ inputs.no-checklist-keyword }}" in PR description')
             return false;
           } else {
             return true;
           }
-    - name: Read review checklist template from file
-      if: steps.check-create-checklist.outputs.result == 'true'
-      shell: bash
-      run: |
-        {
-          echo 'REVIEW_CHECKLIST<<REVIEW_CHECKLIST_EOF'
-          cat '${{ inputs.file }}'
-          echo
-          echo 'REVIEW_CHECKLIST_EOF'
-        } >> "$GITHUB_ENV"
     - name: Add review checklist as comment
       if: steps.check-create-checklist.outputs.result == 'true'
       uses: actions/github-script@v6
       with:
         script: |
-          const { REVIEW_CHECKLIST } = process.env;
+          const fs = require('fs');
+          const review_checklist = fs.readFileSync('${{ inputs.file }}', 'utf8');
 
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: REVIEW_CHECKLIST,
+            body: review_checklist,
           });
