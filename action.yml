@@ -6,10 +6,29 @@ inputs:
     description: 'Path to review checklist file in current repository.'
     required: true
     default: '.github/review-checklist.md'
+  no-checklist-keyword:
+    description: 'If this keyword is found in the PR description, no checklist will be created.'
+    required: true
+    default: '[no checklist]'
 runs:
   using: "composite"
   steps:
+    - name: Check if review checklist should be created
+      id: check-create-checklist
+      uses: actions/github-script@v6
+      with:
+        result-encoding: string
+        script: |
+          const result = await github.rest.pulls.get({
+            pull_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          const description = result.data.body;
+          return description.includes('${{ inputs.no-checklist-keyword }}');
     - name: Read review checklist template from file
+      if: steps.check-create-checklist.outputs.result == 'true'
+      shell: bash
       run: |
         {
           echo 'REVIEW_CHECKLIST<<REVIEW_CHECKLIST_EOF'
@@ -17,8 +36,8 @@ runs:
           echo
           echo 'REVIEW_CHECKLIST_EOF'
         } >> "$GITHUB_ENV"
-      shell: bash
     - name: Add review checklist as comment
+      if: steps.check.outputs.create-checklist == 'true'
       uses: actions/github-script@v6
       with:
         script: |
