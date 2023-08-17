@@ -22,7 +22,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
       - name: Add review checklist
-        uses: sloede/add-pr-review-checklist#main
+        uses: sloede/add-pr-review-checklist@main
         with:
           file: .github/review-checklist.md
 ```
