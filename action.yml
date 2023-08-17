@@ -1,0 +1,47 @@
+name: 'Add PR review checklist'
+author: Michael Schlottke-Lakemper
+description: 'Automatically add a review checklist to newly created pull requests'
+inputs:
+  file:
+    description: 'Path to review checklist file in current repository.'
+    required: true
+    default: '.github/review-checklist.md'
+  no-checklist-keyword:
+    description: 'If this keyword is found in the PR description, no checklist will be created.'
+    required: true
+    default: '[no checklist]'
+runs:
+  using: "composite"
+  steps:
+    - name: Check if review checklist should be created
+      id: check-create-checklist
+      uses: actions/github-script@v6
+      with:
+        result-encoding: string
+        script: |
+          const result = await github.rest.pulls.get({
+            pull_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+          });
+          const description = result.data.body;
+          if (description.includes('${{ inputs.no-checklist-keyword }}')) {
+            console.log('Checklist creation disabled by keyword "${{ inputs.no-checklist-keyword }}" in PR description')
+            return false;
+          } else {
+            return true;
+          }
+    - name: Add review checklist as comment
+      if: steps.check-create-checklist.outputs.result == 'true'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const review_checklist = fs.readFileSync('${{ inputs.file }}', 'utf8');
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: review_checklist,
+          });
