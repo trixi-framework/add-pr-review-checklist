@@ -25,7 +25,7 @@ runs:
             repo: context.repo.repo,
           });
           const description = result.data.body;
-          if (description.includes('${{ inputs.no-checklist-keyword }}')) {
+          if (description != null && description.includes('${{ inputs.no-checklist-keyword }}')) {
             console.log('Checklist creation disabled by keyword "${{ inputs.no-checklist-keyword }}" in PR description')
             return false;
           } else {
